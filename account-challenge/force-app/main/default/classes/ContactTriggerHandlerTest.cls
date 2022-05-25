@@ -12,4 +12,5 @@ public  class ContactTriggerHandlerTest {
             System.assert(sr.isSuccess());
         }
     }
+
 }
