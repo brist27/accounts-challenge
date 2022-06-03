@@ -1,12 +1,21 @@
 {
-  "packageDirectories": [
-    {
-      "path": "force-app",
-      "default": true
+    "packageDirectories": [
+        {
+            "path": "force-app",
+            "default": true,
+            "package": "AccountChallenge",
+            "versionName": "ver 1.1.2",
+            "versionNumber": "1.1.2.NEXT"
+        }
+    ],
+    "name": "account-challenge",
+    "namespace": "",
+    "sfdcLoginUrl": "https://login.salesforce.com",
+    "sourceApiVersion": "54.0",
+    "packageAliases": {
+        "AccountChallenge": "0Ho5c000000k9leCAA",
+        "AccountChallenge@1.0.0-1": "04t5c000001ZYsEAAW",
+        "AccountChallenge@1.1.0-1": "04t5c000001ZaEuAAK",
+        "AccountChallenge@1.1.2-1": "04t5c000001ZaEzAAK"
     }
-  ],
-  "name": "account-challenge",
-  "namespace": "",
-  "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "54.0"
 }
