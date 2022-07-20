@@ -1,5 +1,9 @@
 public with sharing class ContactTriggerHandler extends TriggerHandler {
 
+    
+
+    public ContactsService contactService = new ContactsService();
+
     private Map<Id, Contact> newContactMap;
     private Map<Id, Contact> oldContactMap;
 
@@ -9,27 +13,22 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
     }
 
     public override void afterInsert(){
-        contactsList(newContactMap);
+        contactsList(this.newContactMap);
     }
     
 
+    
     public override void afterUpdate(){
-        contactsList(newContactMap);
+        contactsList(this.newContactMap);
 
     }
 
     public override void afterDelete(){
-        contactsList(oldContactMap);
+        contactsList(this.oldContactMap);
     }
 
-    public static void contactsList(Map<Id,Contact> contacts){
-        
-        Set<Id> accountsId = new Set<Id>();
-        for(Contact c: contacts.values())
-        {
-            accountsId.add(c.accountId);
-        }
-        
-        AccountTriggerHandler.updateDescriptionAccount(accountsId);
+    public void contactsList(Map<Id,Contact> contacts){
+
+        contactService.validationMethod(contacts);
     }
 }
