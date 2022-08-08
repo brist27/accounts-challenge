@@ -70,10 +70,16 @@ public class TestDataFactory {
         return accountsId;
     }
 
-    public static List<Account> returnAcc(){
-        List<Account> accs = new List<Account>();
+    public static List<AccountsSelector.AccountInfo> returnAcc(){
+        List<AccountsSelector.AccountInfo> accs = new List<AccountsSelector.AccountInfo>();
+        List<ContactInfo> contacts = new List<ContactInfo>();
+
+        for(Contact c: createAccountsWithContacts()){
+            contacts.add(new ContactInfo(c));
+        }
+        
         for(Account a: createAccounts(1)){
-            accs.add(a);
+            accs.add(new AccountsSelector.AccountInfo(a, contacts));
         }
         return accs;
     }

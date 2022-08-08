@@ -7,7 +7,7 @@ public with sharing class AccountsSelector_Test {
         AccountsSelector accountsSelector = new AccountsSelector();
 
         Test.startTest();
-        List<Account> accountList = accountsSelector.getAccountsWithContacts(TestDataFactory.acctids());
+        List<AccountsSelector.AccountInfo> accountList = accountsSelector.getAccountsWithContacts(TestDataFactory.acctids());
         Test.stopTest();
 
         System.assert(accountList.size() > 0 );
