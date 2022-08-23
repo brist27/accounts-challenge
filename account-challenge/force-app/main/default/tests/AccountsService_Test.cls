@@ -2,19 +2,26 @@
 public with sharing class AccountsService_Test {
     
     @IsTest
-    public static void updateAccountRecords_Test(){
+    public static void updateAccounts_Test(){
 
-        Stub stub = new Stub(AccountsDomain.class);
+        Stub stub = new Stub(AccountsSelector.class);
 
-        stub.setReturnValue('updateDescriptionField', TestDataFactory.returnAccWithContacts());
+        List<Account> accList = TestDataFactory.insertAccounts();
+        List<Contact> contacts = TestDataFactory.createAccountsWithContacts(accList);
+        insert contacts;
+
+        stub.setReturnValue('selectByIds', accList);
+        stub.setReturnValue('getAccountsInfo', TestDataFactory.getMap());
 
         AccountsService accountsService = new AccountsService();
-	    accountsService.accountsDomain = (AccountsDomain) stub.instance;
+	    accountsService.accountsSelector = (AccountsSelector) stub.instance;
         
         Test.startTest();
-        accountsService.updateAccountRecords(TestDataFactory.acctids());
+        accountsService.updateAccounts(TestDataFactory.acctids());
+
         Test.stopTest();
 
-        stub.assertInvoked('updateDescriptionField');
+        stub.assertInvoked('selectByIds');
+        stub.assertInvoked('getAccountsInfo');
     }
 }

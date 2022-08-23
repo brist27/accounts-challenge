@@ -1,36 +1,53 @@
-public  class AccountsSelector{
-    public List<AccountInfo> wrapAccountList {get; set;}
-    public List<ContactInfo> wrapContactList {get;set;}
+public with sharing class AccountsSelector {
+    // public Map<Id, AccountInfo> wrapAccountMap  {get;set;}
 
-    public List<AccountInfo> getAccountsWithContacts(Set<Id> ids){
-        wrapAccountList = new List<AccountInfo>();
-        wrapContactList = new List<ContactInfo>();
+    public List<Account> selectByIds(Set<Id> accountIds){
+        return [
+            SELECT Id
+            FROM Account
+            WHERE Id IN :accountIds
+           
+        ];
+    }
 
-        for(Account account :[SELECT Id, Name,Description, (SELECT Id, Birthdate from Contacts ORDER BY Birthdate ASC) from Account WHERE Id In :ids]){
+    public Map<Id,AccountInfo> getAccountsInfo(Set<Id> ids){
+        Map<Id, AccountInfo> wrapAccountMap = new Map<Id,AccountInfo>();
+
+        for(AggregateResult result :[SELECT AccountId , COUNT(Id) contactsTotal,  MIN(Birthdate) oldestContact, MAX(Birthdate) youngestContact from Contact WHERE AccountId In :ids group by Accountid]){
             
-            for(Contact contact: account.Contacts){
-                wrapContactList.add(new ContactInfo(contact));
-            }
-            wrapAccountList.add(new AccountInfo(account,wrapContactList));
+                
+                wrapAccountMap.put( (Id) result.get('AccountId'), new AccountInfo(result));
         }
         
-    return wrapAccountList;
+    return wrapAccountMap;
     }
 
     public class AccountInfo {
-        public Id AccountId {get;set;}
-        public String AccountName {get;set;}
-        public String AccountDescription {get;set;}
-        public Integer ContactsTotal {get;set;}
-        public List<ContactInfo> ContactsRelated {get;set;}
+        /*public AggregateResult result;	
+        public Id accId {
+            get { return (Id) result.get('accId');} }		
+		public Integer contactsTotal { 
+			get { return (Integer) result.get('contactsTotal'); } }	
+		public Date oldestContact { 
+			get { return (Date) result.get('oldestContact'); } }	
+		public Date youngestContact { 
+			get { return (Date) result.get('youngestContact'); } }	
+		public AccountInfo(AggregateResult result) { 
+			this.result = result; }*/
 
-        public AccountInfo(Account account, List<ContactInfo> contacts) {
-            AccountId = account.Id;
-            AccountName = account.Name;
-            AccountDescription = account.Description;
-            ContactsTotal = account.Contacts.size();
-            ContactsRelated = contacts;
-        }		
+            	
+            
+            public Integer contactsTotal;
+            public Date oldestContact ;
+            public Date youngestContact;
+            
+            public AccountInfo(AggregateResult result){
+                this.contactsTotal = (Integer) result.get('contactsTotal');
+                this.oldestContact = (Date) result.get('oldestContact');
+                this.youngestContact = (Date) result.get('youngestContact');
+                
+            }
+
+        
     }
-    
 }

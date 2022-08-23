@@ -2,20 +2,22 @@
 public with sharing class ContactsService_Test {
 
     @IsTest
-    public static void validationMethod_Test()
+    public static void updateDescriptionFieldToRelatedAccount_Test()
     {
-        Stub stub = new Stub(ContactsDomain.class);
+        Stub stub = new Stub(AccountsService.class);
 
-        stub.setReturnValue('getAccountIds', TestDataFactory.acctids());
+        stub.setReturnValue('updateAccounts', null);
 
         ContactsService contactsService = new ContactsService();
-	    contactsService.contactsDomain = (ContactsDomain) stub.instance;
+	    contactsService.accountsService = (AccountsService) stub.instance;
 
         Test.startTest();
-        contactsService.validationMethod(TestDataFactory.insertContacts());
+        
+        List<Contact> contactsList = TestDataFactory.insertContacts();
+        contactsService.updateDescriptionFieldToRelatedAccount(contactsList);
         Test.stopTest();
 
-        stub.assertInvoked('getAccountIds');
+        stub.assertInvoked('updateAccounts');
     }
 
       

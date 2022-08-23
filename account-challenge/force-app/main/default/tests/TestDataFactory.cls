@@ -1,18 +1,22 @@
 @isTest
 public class TestDataFactory {
 
-    public static List<Account> createAccounts(Integer numAccts){
+    public static List<Account> createAccounts(){
         List<Account> accts = new List<Account>();
-        for(Integer i=0;i<numAccts;i++) {
-            Account a = new Account(Name='TestAccount' + i);
-            accts.add(a);
-        }
-        insert accts;
-        //System.debug(accts);
+        
+        Account a = new Account(Name='TestAccount');
+        accts.add(a);
+        
         return accts;
     }
-    public static List<Contact> createAccountsWithContacts() {
-        List<Account> accts = createAccounts(1);
+
+    public static List<Account> insertAccounts(){
+        List<Account> accts = createAccounts();
+        insert accts;
+        return accts;
+    }
+    public static List<Contact> createAccountsWithContacts(List<Account> accts) {
+        //List<Account> accts = insertAccounts();
         List<Contact> contacts = new List<Contact>();
         for (Integer j=0;j<1;j++) {
             Account acct = accts[j];
@@ -25,21 +29,35 @@ public class TestDataFactory {
             contacts.add(new Contact(Firstname='Contact ', Lastname='3',
                                        AccountId=acct.Id));
         }
+        //insert contacts;
         return contacts;
     }
 
-    public static Map<Id,Contact> insertContacts(){
-        List<Contact> contacts = createAccountsWithContacts();
+    public static List<Contact> insertContacts(){
+        List<Account> accList = insertAccounts();
+        List<Contact> contacts =  createAccountsWithContacts(accList);
         insert contacts;
-        Map<Id,Contact> contactMap = new Map<Id,Contact>(contacts);
+        return contacts;
 
-        return contactMap;
+    }
+
+    public static Map<Id,AccountsSelector.AccountInfo> getMap( ){
+        
+        Map<Id,AccountsSelector.AccountInfo> accMap = new Map<Id,AccountsSelector.AccountInfo>();
+        for(AggregateResult result: [SELECT AccountId , COUNT(Id) contactsTotal,  MIN(Birthdate) oldestContact, MAX(Birthdate) youngestContact from Contact  group by Accountid] ){
+           
+            accMap.put((Id) result.get('AccountId'), new AccountsSelector.AccountInfo(result));
+        }
+        
+        return accMap;
+
     }
 
     public static List<Contact> contactUpdated(){
-        Map<Id,Contact> mapContacts = insertContacts();
+        List<Contact> contactsList = insertContacts();
+        
         List<Contact> contacts = new List<Contact>();
-        for(Contact c:  mapContacts.values()){
+        for(Contact c: contactsList ){
             contacts.add(c);
         }
         contacts[0].Birthdate = Date.valueOf('1974-09-07');
@@ -47,11 +65,12 @@ public class TestDataFactory {
     }
 
     public static List<Contact> contactToDelete(){
-        Map<Id,Contact> mapContacts = insertContacts();
+        
+        List<Contact> contactsList = insertContacts();
         List<Contact> contacts = new List<Contact>();
         List<Contact> contactsToDelete = new List<Contact>();
 
-        for(Contact c:  mapContacts.values()){
+        for(Contact c: contactsList ){
             contacts.add(c);
         }
         contactsToDelete.add(contacts[0]);
@@ -61,16 +80,16 @@ public class TestDataFactory {
 
 
     public static  set<Id> acctids(){
-        Map<Id,Contact> contacts = insertContacts(); 
+        List<Account> accountList = insertAccounts(); 
         Set<Id> accountsId = new Set<Id>();
-        for(Contact c: contacts.values())
+        for(Account a: accountList)
         {
-            accountsId.add(c.accountId);
+            accountsId.add(a.Id);
         }
         return accountsId;
     }
 
-    public static List<AccountsSelector.AccountInfo> returnAcc(){
+    /*public static List<AccountsSelector.AccountInfo> returnAcc(){
         List<AccountsSelector.AccountInfo> accs = new List<AccountsSelector.AccountInfo>();
         List<ContactInfo> contacts = new List<ContactInfo>();
 
@@ -82,14 +101,24 @@ public class TestDataFactory {
             accs.add(new AccountsSelector.AccountInfo(a, contacts));
         }
         return accs;
-    }
+    }*/
 
-    public static List<Account> returnAccWithContacts(){
+    /*public static List<Account> returnAccountListWithDescription(){
         List<Account> accs = new List<Account>();
         for(Account a: createAccounts(1)){
             a.Description = 'There are 3 contacts related.\n The oldest Contact has 47 years.\n The youngest Contact has 24 years.';
             accs.add(a);
         }
         return accs;
+    }*/
+
+    public static List<Account> accountsBeforeInsert(){
+        List<Account> accList = createAccounts();
+
+        for(Account a: accList){
+            a.Description = 'There are 3 contacts related.\n';
+            accList.add(a);
+        }
+        return accList;
     }
 }

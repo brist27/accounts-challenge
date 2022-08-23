@@ -4,31 +4,31 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
 
     public ContactsService contactService = new ContactsService();
 
-    private Map<Id, Contact> newContactMap;
-    private Map<Id, Contact> oldContactMap;
+    private List<Contact> newContact;
+    private List<Contact> oldContact;
 
     public ContactTriggerHandler() {
-        this.newContactMap = (Map<Id, Contact>) Trigger.newMap;
-        this.oldContactMap = (Map<Id, Contact>) Trigger.oldMap;
+        this.newContact = (List<Contact>) Trigger.new;
+        this.oldContact = (List<Contact>) Trigger.old;
     }
 
     public override void afterInsert(){
-        contactsList(this.newContactMap);
+        contactsList(this.newContact);
     }
     
 
     
     public override void afterUpdate(){
-        contactsList(this.newContactMap);
+        contactsList(this.newContact);
 
     }
 
     public override void afterDelete(){
-        contactsList(this.oldContactMap);
+        contactsList(this.oldContact);
     }
 
-    public void contactsList(Map<Id,Contact> contacts){
+    public void contactsList(List<Contact> contacts){
 
-        contactService.validationMethod(contacts);
+        contactService.updateDescriptionFieldToRelatedAccount(contacts);
     }
 }

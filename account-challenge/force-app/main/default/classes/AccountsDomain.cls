@@ -1,47 +1,37 @@
 public with sharing class AccountsDomain {
 
-    public AccountsSelector accountsSelector = new AccountsSelector();
+    public List<Account> accounts;
+    
 
-    public List<Account> updateDescriptionField(Set<Id> ids){
+    public AccountsDomain(List<Account> accounts) {
+        this.accounts = accounts;
+    }
 
-        List<AccountsSelector.AccountInfo>   accountsWithContacts = accountsSelector.getAccountsWithContacts(ids);
+    public AccountsDomain setDescription(){
+        for(Account a :accounts ){
+            a.Description = 'There are not contacts related.';
+         }
+         return this;
+    }
 
-        List<ContactInfo> contactsWithBirthdate = new List<ContactInfo>();
-          List<Account> updatedRecords = new List<Account>();
-          
-  
-          string description;
-          
-          for(AccountsSelector.AccountInfo acc: accountsWithContacts )
-        {
-          
-            for(ContactInfo c:acc.ContactsRelated )
-            {
-                if(c.ContactBirthdate != null){
-                    contactsWithBirthdate.add(c);
-                } 
-                description = 'There are '+ acc.ContactsTotal +' contacts related.\n';
-                integer youngestYear;
-                integer oldestYear;  
-                
-                if(contactsWithBirthdate.size() > 0) 
-                {
-                    Date oldBirthdate = Date.valueof(contactsWithBirthdate[0].ContactBirthdate);
-                    oldestYear = Date.today().year() - oldBirthdate.year();
-                    description = description + 'The oldest Contact has ' + oldestYear + ' years. \n';
+    public AccountsDomain setDescription(Map<Id,AccountsSelector.AccountInfo> accountsMap){
 
-                    if(contactsWithBirthdate.size() > 1){
-                        Date youngBirthdate = Date.valueof(contactsWithBirthdate[contactsWithBirthdate.size()-1].ContactBirthdate);
-                        youngestYear = Date.today().year() - youngBirthdate.year();
-                        description = description +  'The youngest Contact has '+ youngestYear + ' years.';
-                    }
-                }
-            } 
+        string description;
         
-        Account a = new Account(Id = acc.AccountId, Name = acc.AccountName,Description = description);
-        updatedRecords.add(a);
-           
+        for(Account a: accounts){
+
+            AccountsSelector.AccountInfo acc = accountsMap.get(a.Id);
+            
+            description = 'There are '+ acc.contactsTotal +' contacts related.\n';
+
+            if(acc.oldestContact != null && acc.youngestContact != null){
+                description = description + 'The oldest Contact has ' + (Date.today().year() - acc.oldestContact.year()) + ' years.\n';
+                description = description +  'The youngest Contact has '+ (Date.today().year() - acc.youngestContact.year()) + ' years.';
+            }
+            
+        a.Description = description;
         }
-          return updatedRecords;
-      }
+        return this;
+    }
+    
 }

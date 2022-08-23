@@ -4,7 +4,8 @@ public with sharing class ContactTriggerHandler_Test {
     @IsTest
     public static void afterInsert_Test()
     {
-        List<Contact> contactsList = TestDataFactory.createAccountsWithContacts();
+        List<Account> acc = TestDataFactory.insertAccounts();
+        List<Contact> contactsList = TestDataFactory.createAccountsWithContacts(acc);
         Test.startTest();
         insert contactsList;
         Test.stopTest();
@@ -32,17 +33,18 @@ public with sharing class ContactTriggerHandler_Test {
     public static void contactsList_Test(){
         Stub stub = new Stub(ContactsService.class);
 
-        stub.setReturnValue('validationMethod', null);
+        stub.setReturnValue('updateDescriptionFieldToRelatedAccount', null);
 
         ContactTriggerHandler contactTrigger = new ContactTriggerHandler();
 	    contactTrigger.contactService = (ContactsService) stub.instance;
 
         Test.startTest();
-        contactTrigger.contactsList(TestDataFactory.insertContacts());
+        List<Contact> contactsList =TestDataFactory.insertContacts();
+        contactTrigger.contactsList(contactsList);
         Test.stopTest();
 
-        stub.assertInvoked('validationMethod');
+        stub.assertInvoked('updateDescriptionFieldToRelatedAccount');
     }
-
+    
 
 }

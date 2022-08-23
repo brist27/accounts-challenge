@@ -1,25 +1,24 @@
 public with sharing class AccountsService {
-  
-    public AccountsDomain accountsDomain = new AccountsDomain();
+
+    public AccountsSelector accountsSelector = new AccountsSelector();
 
     public void updateDescriptionBeforeInsertAccount(List<Account> accountsList){
        
-        for(Account a :accountsList ){
-           a.Description = 'There are not contacts related.';
-        }
+        new AccountsDomain(accountsList).setDescription();
     }
-    /*public void updateAccountsRecords(Map<Id,Account> accountsMap){
-        Set<Id> ids = accountsDomain.getIds(accountsMap);
-        updateAccountRecords(ids);
-    }*/
 
-    public void updateAccountRecords(Set<Id> accountsIds){
-
-        List<Account> updatedRecords = accountsDomain.updateDescriptionField(accountsIds);
-
+    public void updateAccounts(List<Account> accountsList){
+       
+        Map<Id,AccountsSelector.AccountInfo> accounts = accountsSelector.getAccountsInfo(new Map<Id,Account>(accountsList).keySet());
         
-        update updatedRecords;
+        new AccountsDomain(accountsList).setDescription(accounts);
+        
+        update accountsList;
 
+    }
+
+    public void updateAccounts(Set<Id> accountsIds){
+        updateAccounts(accountsSelector.selectByIds(accountsIds));
     }
 
 }

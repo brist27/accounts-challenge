@@ -1,11 +1,11 @@
 @IsTest
 public with sharing class ContactsDomain_Test {
     @IsTest
-    public static void getAccountIds_Test(){
+    public static void getAccountsIds_Test(){
 
         Test.startTest();
-        ContactsDomain contactsDomain = new ContactsDomain();
-        Set<Id> ids = ContactsDomain.getAccountIds(TestDataFactory.insertContacts());
+        List<Contact> contactsList = TestDataFactory.insertContacts();
+        Set<Id> ids = new ContactsDomain(contactsList).getAccountsIds();
         Test.stopTest();
 
         System.assert(ids.size() > 0);
